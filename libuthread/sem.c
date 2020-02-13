@@ -47,7 +47,7 @@ int sem_down(sem_t sem)
     enter_critical_section();
 	if (sem->count == 0) {
 	    /* nothing in the sem */
-        int* tid = malloc(sizeof(int));
+        pthread_t* tid = malloc(sizeof(pthread_t));
         *tid = pthread_self();
         queue_enqueue(sem->waiting_list, tid);
 
@@ -55,7 +55,7 @@ int sem_down(sem_t sem)
         thread_block();
 
         /* back */
-        free(tid)
+        free(tid);
 	}
 
 	sem->count--;
@@ -74,7 +74,7 @@ int sem_up(sem_t sem)
 	if (queue_length(sem->waiting_list) >= 1) {
         void** data = malloc(sizeof(void*));
         queue_dequeue(sem->waiting_list, data);
-        pthread_t* next = (pthread_t)(*data);
+        pthread_t* next = (pthread_t*)(*data);
         thread_unblock(*next);
 	}
 
