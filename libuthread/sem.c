@@ -45,7 +45,7 @@ int sem_down(sem_t sem)
         return -1;
 	}
     enter_critical_section();
-	if (sem->count == 0) {
+    while (sem->count == 0) {
 	    /* nothing in the sem */
         pthread_t* tid = malloc(sizeof(pthread_t));
         *tid = pthread_self();
