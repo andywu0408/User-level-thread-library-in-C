@@ -100,8 +100,15 @@ int tps_read(size_t offset, size_t length, void *buffer)
     }
 
     tps_t curr_tps = (tps_t)HashMap_get(map, curr_tid);
-    memcpy(buffer, curr_tps->page + offset, length);
+
+    if (curr_tps->flag_clone_target) {
+        tps_t cloned_read = (tps_t)HashMap_get(map, curr_tps->cloned_thread_TPS);
+        memcpy(buffer, cloned_read->page + offset, length);
+    } else {
+        memcpy(buffer, curr_tps->page + offset, length);
+    }
     exit_critical_section();
+
     return 0;
 }
 
@@ -115,10 +122,15 @@ int tps_write(size_t offset, size_t length, void *buffer)
         return -1;
     }
 
+    tps_t curr_tps = (tps_t)HashMap_get(map, curr_tid);
     /* check if curr tps is sharing */
+    if (curr_tps->flag_clone_target) {
+        tps_t tps_to_clone = HashMap_get(map, curr_tps->cloned_thread_TPS);
+        memcpy(curr_tps->page, tps_to_clone->page, TPS_SIZE);
+        curr_tps->flag_clone_target = 0;
+    }
 
     /* copying */
-    tps_t curr_tps = (tps_t)HashMap_get(map, curr_tid);
     memcpy(curr_tps->page + offset, buffer, length);
     exit_critical_section();
     return 0;
@@ -132,9 +144,11 @@ int tps_clone(pthread_t tid)
         exit_critical_section();
         return -1;
     }
+
     tps_t curr_tps = TPS_create();
-    tps_t tps_to_clone = HashMap_get(map, tid);
-    memcpy(curr_tps->page, tps_to_clone->page, TPS_SIZE);
+    curr_tps->flag_clone_target = 1;
+    curr_tps->cloned_thread_TPS = tid;
+
     HashMap_add(map, curr_tid, curr_tps);
     exit_critical_section();
     return 0;
