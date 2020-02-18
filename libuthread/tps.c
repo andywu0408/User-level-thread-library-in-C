@@ -14,12 +14,11 @@
 
 struct tps {
 	int tid;
-	void *page; // TPS_SIZE bytes big
+	void *page;
 };
 
-static queue_t tps_queue; //queue* that stores bunch of tps
+static queue_t tps_queue = NULL; //queue* that stores bunch of tps
 
-/* TODO: Phase 2 */
 
 /*
  * tps_init - Initialize TPS
@@ -41,9 +40,15 @@ int tps_init(int segv)
 		// and display the message "TPS protection error!\n" on stderr
 		perror("TPS protection error!\n");
 		return -1;
+	} else if(tps_queue != NULL){ // TPS API has already been intialized
+		return -1;
 	}
 	// initialize any internal objects before any TPS can be created
 	tps_queue = queue_create();
+
+	if(tps_queue == NULL){ // failure during initialization
+		return -1;
+	}
 
 	return 0;
 }
@@ -115,9 +120,7 @@ int tps_destroy(void)
  * Return: 0 to continue iterating, 1 to stop iterating at this particular item.
  */
 // typedef int (*queue_func_t)(void *data, void *arg);
- 
-
-int _find_target_TPS_page(void *data, int target_tid) { // helper function for tps_read()
+int _find_target_TPS_page(void *data, int target_tid) { // helper function for queue_iterate()
 	int cur_tid = data->tid;
 
 	if(cur_tid != target_tid){ // if this tps is not our target 
@@ -193,9 +196,31 @@ int tps_write(size_t offset, size_t length, void *buffer)
 	return 0;
 }
 
+
+/*
+ * tps_clone - Clone TPS
+ * @tid: TID of the thread to clone
+ *
+ * Clone thread @tid's TPS. In the first phase, the cloned TPS's content should
+ * copied directly. In the last phase, the new TPS should not copy the cloned
+ * TPS's content but should refer to the same memory page.
+ *
+ * Return: -1 if thread @tid doesn't have a TPS, or if current thread already
+ * has a TPS, or in case of failure. 0 is TPS was successfully cloned.
+ */
 int tps_clone(pthread_t tid)
 {
 	/* TODO: Phase 2 */
+    struct tps *temp = (struct tps*)malloc(sizeof(struct tps));
+
+    tps_read(pthread_self(), TPS_SIZE, temp); // store tps of tid to temp
+
+    if(temp == NULL){
+    	return -1
+    }
+
+    tps_write(tid->pthread_self(), TPS_SIZE, temp); // store temp to tps of current thread
 	
+    return 0;
 }
 
