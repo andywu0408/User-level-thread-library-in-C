@@ -44,7 +44,7 @@ int tps_init(int segv)
 	}
 	// initialize any internal objects before any TPS can be created
 	tps_queue = queue_create();
-	
+
 	return 0;
 }
 
@@ -58,14 +58,25 @@ int tps_init(int segv)
  * the creation (e.g. memory allocation). 0 if the TPS area was successfully
  * created.
  */
-int tps_create(void)
+int tps_create(void) 
 {
 	/* TODO: Phase 2 */
+	tps *curr = mmap(NULL, TPS_SIZE, PROT_READ | PROT_WRITE,
+		MAP_PRIVATE | MAP_ANONYMOUS, -1, 0); // page is private and anonymous, and can be accessed in reading and writing.
+
+	if(curr = NULL || queue_length(tps_queue) > 0){ // if failure during creation or current thread already has tps
+		return -1;
+	}
+
+	queue_enqueue(tps_queue, curr);
+
+	return 0;
 }
 
 int tps_destroy(void)
 {
 	/* TODO: Phase 2 */
+	
 }
 
 int tps_read(size_t offset, size_t length, void *buffer)
