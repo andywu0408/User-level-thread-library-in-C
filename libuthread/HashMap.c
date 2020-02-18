@@ -79,6 +79,9 @@ void resize(map_t map) {
         }
     }
 
+    /* free the old array, pair is moved into new array*/
+    free(map->array);
+
     map->capacity = new_size;
     map->array = new_array;
 }
