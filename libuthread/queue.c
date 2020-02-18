@@ -8,7 +8,7 @@
 struct queue {
     LinkedListNode_t head;
     LinkedListNode_t tail;
-	int size;
+    int size;
 };
 
 queue_t queue_create(void)
