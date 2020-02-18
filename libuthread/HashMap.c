@@ -190,3 +190,17 @@ int HashMap_size(map_t map) {
     }
     return map->size;
 }
+
+int HashMap_destroy(map_t map) {
+    if (map == NULL) {
+        return -1;
+    }
+    for (int i = 0; i < map->capacity; i++) {
+        LinkedListNode_t temp = (map->array)[i];
+        while (temp != NULL) {
+            temp = destructor(temp);
+        }
+    }
+    free(map);
+    return 0;
+}

@@ -58,5 +58,12 @@ void* HashMap_get(map_t map, pthread_t tid);
  */
 int HashMap_size(map_t map);
 
+/**
+ * HashMap destroy; memo free; this should be called by the library or kernel
+ * @param map
+ * @return 0 if destroyed
+ *        -1 if map is NULL
+ */
+int HashMap_destroy(map_t map);
 
 #endif //PROJECT3_HASHMAP_H
