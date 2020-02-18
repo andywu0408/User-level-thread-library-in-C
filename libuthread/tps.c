@@ -61,10 +61,13 @@ int tps_init(int segv)
 int tps_create(void) 
 {
 	/* TODO: Phase 2 */
-	tps *curr = mmap(NULL, TPS_SIZE, PROT_READ | PROT_WRITE,
+	tps *curr;
+
+	curr->tid = queue_length(tps_queue);
+	curr->page = mmap(NULL, TPS_SIZE, PROT_READ | PROT_WRITE,
 		MAP_PRIVATE | MAP_ANONYMOUS, -1, 0); // page is private and anonymous, and can be accessed in reading and writing.
 
-	if(curr = NULL || queue_length(tps_queue) > 0){ // if failure during creation or current thread already has tps
+	if(curr == NULL || curr->page == NULL || queue_length(tps_queue) > 0){ // if failure during creation or current thread already has tps
 		return -1;
 	}
 
@@ -73,20 +76,114 @@ int tps_create(void)
 	return 0;
 }
 
+/*
+ * tps_destroy - Destroy TPS
+ *
+ * Destroy the TPS area associated to the current thread.
+ *
+ * Return: -1 if current thread doesn't have a TPS. 0 if the TPS area was
+ * successfully destroyed.
+ */
 int tps_destroy(void)
 {
 	/* TODO: Phase 2 */
-	
+	if(queue_length(tps_queue) <= 0){
+		return -1;
+	}
+
+	queue_destroy(tps_queue);
+	free(tps_queue)
+
+	return 0;
+
 }
 
+/*
+ * queue_func_t - Queue callback function type
+ * @data: Data item
+ * @arg: Extra argument
+ *
+ * Return: 0 to continue iterating, 1 to stop iterating at this particular item.
+ */
+// typedef int (*queue_func_t)(void *data, void *arg);
+
+/*
+ * queue_func_t - Queue callback function type
+ * @data: Data item
+ * @arg: Extra argument
+ *
+ * Return: 0 to continue iterating, 1 to stop iterating at this particular item.
+ */
+// typedef int (*queue_func_t)(void *data, void *arg);
+ 
+
+int find_target_TPS_page(void *data, int target_tid) { // helper function for tps_read()
+	int cur_tid = data->tid;
+
+	if(cur_tid != target_tid){ // if this tps is not our target 
+		return 0; // continue queue with iterating
+	}
+
+	return 1; // stop queue from iterating at this particular item
+}
+/*
+ * tps_read - Read from TPS
+ * @offset: Offset where to read from in the TPS
+ * @length: Length of the data to read
+ * @buffer: Data buffer receiving the read data
+ *
+ * Read @length bytes of data from the current thread's TPS at byte offset
+ * @offset into data buffer @buffer.
+ *
+ * Return: -1 if current thread doesn't have a TPS, or if the reading operation
+ * is out of bound, or if @buffer is NULL, or in case of internal failure. 0 if 
+ * the TPS was successfully read from.
+ */
 int tps_read(size_t offset, size_t length, void *buffer)
 {
 	/* TODO: Phase 2 */
+	if(queue_length(tps_queue) <= 0 || queue_length(tps_queue) > offset
+		|| buffer == NULL) {
+		return -1;
+	}
+	struct tps *temp = (struct tps*)malloc(sizeof(struct tps));
+
+	//if(int queue_iterate(queue_t queue, queue_func_t func, void *arg, void **data);)
+	if(queue_iterate(tps_queue, find_target_TPS_page, (void*)offset, &temp) == -1){
+		return -1; // internal failure
+	} else {
+		memcpy(temp->page, buffer, length); // store the target tps's page into buffer
+	}
+
+	return 0;
 }
 
+/*
+ * tps_write - Write to TPS
+ * @offset: Offset where to write to in the TPS
+ * @length: Length of the data to write
+ * @buffer: Data buffer holding the data to be written
+ *
+ * Write @length bytes located in data buffer @buffer into the current thread's
+ * TPS at byte offset @offset.
+ *
+ * If the current thread's TPS shares a memory page with another thread's TPS,
+ * this should trigger a copy-on-write operation before the actual write occurs.
+ *
+ * Return: -1 if current thread doesn't have a TPS, or if the writing operation
+ * is out of bound, or if @buffer is NULL, or in case of failure. 0 if the TPS
+ * was successfully written to.
+ */
 int tps_write(size_t offset, size_t length, void *buffer)
 {
 	/* TODO: Phase 2 */
+	if(queue_length(tps_queue) <= 0 || queue_length(tps_queue) > offset
+		|| buffer == NULL){
+		return -1;
+	}
+
+
+
 }
 
 int tps_clone(pthread_t tid)
