@@ -117,7 +117,7 @@ int tps_destroy(void)
 // typedef int (*queue_func_t)(void *data, void *arg);
  
 
-int find_target_TPS_page(void *data, int target_tid) { // helper function for tps_read()
+int _find_target_TPS_page(void *data, int target_tid) { // helper function for tps_read()
 	int cur_tid = data->tid;
 
 	if(cur_tid != target_tid){ // if this tps is not our target 
@@ -149,7 +149,7 @@ int tps_read(size_t offset, size_t length, void *buffer)
 	struct tps *temp = (struct tps*)malloc(sizeof(struct tps));
 
 	//if(int queue_iterate(queue_t queue, queue_func_t func, void *arg, void **data);)
-	if(queue_iterate(tps_queue, find_target_TPS_page, (void*)offset, &temp) == -1){
+	if(queue_iterate(tps_queue, _find_target_TPS_page, (void*)offset, &temp) == -1){
 		return -1; // internal failure
 	} else {
 		memcpy(temp->page, buffer, length); // store the target tps's page into buffer
@@ -182,12 +182,20 @@ int tps_write(size_t offset, size_t length, void *buffer)
 		return -1;
 	}
 
+	struct tps *temp = (struct tps*)malloc(sizeof(struct tps));
 
+	if(queue_iterate(tps_queue, _find_target_TPS_page, (void*)offset, &temp) == -1){ // internal failure
+		return -1; 
+	} else {
+		memcpy(buffer, temp->page, length); // store data buffer to target tps's page
+	}
 
+	return 0;
 }
 
 int tps_clone(pthread_t tid)
 {
 	/* TODO: Phase 2 */
+	
 }
 
