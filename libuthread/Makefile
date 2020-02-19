@@ -10,10 +10,6 @@ ifneq ($(V),1)
 Q = @
 endif
 
-ifneq ($(D),1)
-FLAGS += -O2
-endif
-
 all: $(lib)
 
 deps := $(patsubst %.o, %.d, $(lib))
