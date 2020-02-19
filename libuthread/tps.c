@@ -45,10 +45,10 @@ static void segv_handler(int sig, siginfo_t *si, __attribute__((unused)) void *c
 
     /* iterate through all TPS pages to find a TPS page that matches p_fault */
     for (int i = 0; i < HashMap_size(map); i++) { 
-        void* curr_tps_page = *((void*)(tps_list[i]));
-        if (!memcmp(curr_tps_page, p_fault, TPS_SIZE)){ 
+        tps_t curr_tps = (tps_t)tps_list[i];
+        if (!memcmp(curr_tps->page, p_fault, TPS_SIZE)){
             /* if there is p_fault inside this TPS page, there is protection error */
-            printf(stderr, "TPS protection error!\n");
+            fprintf(stderr, "TPS protection error!\n");
         }
     }
 
