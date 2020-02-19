@@ -147,7 +147,7 @@ int HashMap_remove(map_t map, pthread_t tid) {
             if (((pair_t)(temp->data))->tid == tid) {
                 free(temp->data);
                 if (prev == NULL) {
-                    (map->array)[slot] == NULL;
+                    (map->array)[slot] = NULL;
                 } else {
                     prev->next = destructor(prev->next);
                 }
@@ -170,14 +170,12 @@ void* HashMap_get(map_t map, pthread_t tid) {
     if ((map->array)[slot] == NULL) {
         return NULL;
     } else {
-        LinkedListNode_t prev = NULL;
         LinkedListNode_t temp = (map->array)[slot];
         while (temp != NULL) {
             /* find tid in map */
             if (((pair_t)(temp->data))->tid == tid) {
                 return ((pair_t)(temp->data))->tps;
             }
-            prev = temp;
             temp = temp->next;
         }
     }

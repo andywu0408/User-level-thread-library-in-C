@@ -89,7 +89,8 @@ int sem_getvalue(sem_t sem, int *sval)
     }
 
     enter_critical_section();
-    *sval = sem->count == 0 ? -queue_length(sem->waiting_list) : sem->count;
+    *sval = sem->count == 0 ? -queue_length(sem->waiting_list) : ((signed
+            int) sem->count);
     exit_critical_section();
     return 0;
 }
