@@ -37,6 +37,21 @@ int main() {
         HashMap_add(my_map, i * 3 + 1, temp);
     }
 
+    pthread_t* curr_keys = HashMap_getKeys(my_map);
+    void** curr_values = HashMap_getValues(my_map);
+
+    printf("Keys: ");
+    for (int i = 0; i < HashMap_size(my_map); i++) {
+        printf("%ld ", curr_keys[i]);
+    }
+    printf("\n");
+
+    printf("Values: ");
+    for (int i = 0; i < HashMap_size(my_map); i++) {
+        printf("%c ", *((char*)(curr_values[i])));
+    }
+    printf("\n");
+
     for (int i = 0; i < strlen(buffer) * 3 - 1; i++) {
         printf("==== Try to get key %d ====\n", i);
         void* temp = HashMap_get(my_map, i);

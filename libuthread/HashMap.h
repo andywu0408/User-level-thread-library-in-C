@@ -66,4 +66,18 @@ int HashMap_size(map_t map);
  */
 int HashMap_destroy(map_t map);
 
+/**
+ * getKeys operations in HashMap
+ * @param map
+ * @return array of keys
+ */
+pthread_t* HashMap_getKeys(map_t map);
+
+/**
+ * getValues operation in HashMap
+ * @param map
+ * @return array of values
+ */
+void** HashMap_getValues(map_t map);
+
 #endif //PROJECT3_HASHMAP_H

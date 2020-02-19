@@ -182,6 +182,44 @@ void* HashMap_get(map_t map, pthread_t tid) {
     return NULL;
 }
 
+pthread_t* HashMap_getKeys(map_t map) {
+    if (map == NULL) {
+        return NULL;
+    }
+    pthread_t* keys = (pthread_t*)malloc(sizeof(pthread_t) * HashMap_size(map));
+    int i = 0;
+    for (int j = 0; j < map->capacity; j++) {
+        if ((map->array)[j] != NULL) {
+            LinkedListNode_t temp = (map->array)[j];
+            while (temp != NULL) {
+                keys[i++] = ((pair_t)(temp->data))->tid;
+                temp = temp->next;
+            }
+        }
+    }
+
+    return keys;
+}
+
+void** HashMap_getValues(map_t map) {
+    if (map == NULL) {
+        return NULL;
+    }
+    void** values = (void**)malloc(sizeof(void*) * HashMap_size(map));
+    int i = 0;
+    for (int j = 0; j < map->capacity; j++) {
+        if ((map->array)[j] != NULL) {
+            LinkedListNode_t temp = (map->array)[j];
+            while (temp != NULL) {
+                values[i++] = ((pair_t)(temp->data))->tps;
+                temp = temp->next;
+            }
+        }
+    }
+
+    return values;
+}
+
 int HashMap_size(map_t map) {
     if (map == NULL) {
         return -1;
