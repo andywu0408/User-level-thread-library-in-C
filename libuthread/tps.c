@@ -42,7 +42,13 @@ int tps_init(int segv)
     }
 
     if (segv) {
-        /* install the handler*/
+//        struct sigaction sa;
+//
+//        sigemptyset(&sa.sa_mask);
+//        sa.sa_flags = SA_SIGINFO;
+//        sa.sa_sigaction = segv_handler;
+//        sigaction(SIGBUS, &sa, NULL);
+//        sigaction(SIGSEGV, &sa, NULL);
     }
 
     return 0;
@@ -55,7 +61,7 @@ int tps_init(int segv)
  */
 tps_t TPS_create() {
     tps_t curr = (tps_t)malloc(sizeof(struct TPS));
-    curr->page = mmap(NULL, TPS_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE |
+    curr->page = mmap(NULL, TPS_SIZE, PROT_NONE , MAP_PRIVATE |
     MAP_ANONYMOUS, -1, 0);
     if (curr->page == NULL) {
         return NULL;
@@ -103,9 +109,13 @@ int tps_read(size_t offset, size_t length, void *buffer)
 
     if (curr_tps->flag_clone_target) {
         tps_t cloned_read = (tps_t)HashMap_get(map, curr_tps->cloned_thread_TPS);
+        mprotect(cloned_read->page, TPS_SIZE, PROT_READ);
         memcpy(buffer, cloned_read->page + offset, length);
+        mprotect(cloned_read->page, TPS_SIZE, PROT_NONE);
     } else {
+        mprotect(curr_tps->page, TPS_SIZE, PROT_READ);
         memcpy(buffer, curr_tps->page + offset, length);
+        mprotect(curr_tps->page, TPS_SIZE, PROT_NONE);
     }
     exit_critical_section();
 
@@ -126,12 +136,20 @@ int tps_write(size_t offset, size_t length, void *buffer)
     /* check if curr tps is sharing */
     if (curr_tps->flag_clone_target) {
         tps_t tps_to_clone = HashMap_get(map, curr_tps->cloned_thread_TPS);
+        /* open access */
+        mprotect(tps_to_clone->page, TPS_SIZE, PROT_READ);
+        mprotect(curr_tps->page, TPS_SIZE, PROT_WRITE);
         memcpy(curr_tps->page, tps_to_clone->page, TPS_SIZE);
+        /* close access */
+        mprotect(curr_tps->page, TPS_SIZE, PROT_NONE);
+        mprotect(tps_to_clone->page, TPS_SIZE, PROT_NONE);
         curr_tps->flag_clone_target = 0;
     }
 
     /* copying */
+    mprotect(curr_tps->page, TPS_SIZE, PROT_WRITE);
     memcpy(curr_tps->page + offset, buffer, length);
+    mprotect(curr_tps->page, TPS_SIZE, PROT_NONE);
     exit_critical_section();
     return 0;
 }
