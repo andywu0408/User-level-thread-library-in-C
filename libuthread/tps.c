@@ -30,6 +30,35 @@ struct TPS {
 
 typedef struct TPS* tps_t;
 
+/**
+ * Signal handler that distinguish between real segfaults and TPS protection faults
+ */
+static void segv_handler(int sig, siginfo_t *si, __attribute__((unused)) void *context)
+{
+    /*
+     * Get the address corresponding to the beginning of the page where the
+     * fault occurred
+     */
+    void *p_fault = (void*)((uintptr_t)si->si_addr & ~(TPS_SIZE - 1));
+
+    void **tps_list = HashMap_getValues(map);
+
+    /* iterate through all TPS pages to find a TPS page that matches p_fault */
+    for (int i = 0; i < HashMap_size(map); i++) { 
+        void* curr_tps_page = *((void*)(tps_list[i]));
+        if (!memcmp(curr_tps_page, p_fault, TPS_SIZE)){ 
+            /* if there is p_fault inside this TPS page, there is protection error */
+            printf(stderr, "TPS protection error!\n");
+        }
+    }
+
+    /* In any case, restore the default signal handlers */
+    signal(SIGSEGV, SIG_DFL);
+    signal(SIGBUS, SIG_DFL);
+    /* And transmit the signal again in order to cause the program to crash */
+    raise(sig);
+}
+
 int tps_init(int segv)
 {
     if (map != NULL) {
@@ -42,13 +71,13 @@ int tps_init(int segv)
     }
 
     if (segv) {
-//        struct sigaction sa;
-//
-//        sigemptyset(&sa.sa_mask);
-//        sa.sa_flags = SA_SIGINFO;
-//        sa.sa_sigaction = segv_handler;
-//        sigaction(SIGBUS, &sa, NULL);
-//        sigaction(SIGSEGV, &sa, NULL);
+       struct sigaction sa;
+
+       sigemptyset(&sa.sa_mask);
+       sa.sa_flags = SA_SIGINFO;
+       sa.sa_sigaction = segv_handler;
+       sigaction(SIGBUS, &sa, NULL);
+       sigaction(SIGSEGV, &sa, NULL);
     }
 
     return 0;
