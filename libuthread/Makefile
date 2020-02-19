@@ -16,8 +16,6 @@ endif
 
 all: $(lib)
 
-## TODO: Phase 1 and Phase 2
-
 deps := $(patsubst %.o, %.d, $(lib))
 DEPFLAGS = -MMD -MF $(@:.o=.d)
 
