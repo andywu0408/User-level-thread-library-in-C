@@ -7,6 +7,16 @@
  * test basic @operation add, get, remove, destroy, and create
  * test inner mechanism chaining when collision
  * test inner mechanism resize when map is close to full
+ *
+ * The tester makes each character in a buffer associate with some integer or
+ * pthread_t key and put the pair into the map; Then we will use random keys
+ * to get characters back in the map and if we have gotten some characters
+ * back, we remove the key value pair.
+ *
+ * Corner cases, such as map is NULL, are all defined in the header file and
+ * handled in the source. For the usage of HashMap, please refer to the
+ * header file.
+ *
  * expected output matched
  */
 
