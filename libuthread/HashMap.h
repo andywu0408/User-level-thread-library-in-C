@@ -11,7 +11,7 @@
  * Map<pid, TSP>, it could support generics, but I'm lazy :)
  * basic chaining map - only support simple operations
  *
- * use get if checking if a key exists is needed. Lazy.
+ * use get if checking if a key exists is needed.
  */
 typedef struct HashMap* map_t;
 
@@ -51,8 +51,7 @@ int HashMap_remove(map_t map, pthread_t tid);
 void* HashMap_get(map_t map, pthread_t tid);
 
 /**
- * this is not supposed to be used in this project, but get size is a basic
- * operation for any data structure
+ * get size of map
  * @param map
  * @return size of HashMap
  */

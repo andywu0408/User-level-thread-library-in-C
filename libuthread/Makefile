@@ -3,8 +3,8 @@ CC := gcc
 lib := libuthread.a
 FLAGS  := -Wall -Wextra -Werror
 
-generated_object_files := sem.o LinkedListNode.o HashMap.o tps.o
-provided_object_files := thread.o queue.o
+generated_object_files := sem.o LinkedListNode.o HashMap.o tps.o  queue.o
+provided_object_files := thread.o
 
 ifneq ($(V),1)
 Q = @
