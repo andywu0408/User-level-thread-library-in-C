@@ -5,6 +5,19 @@ programs := \
 	sem_buffer.x \
 	sem_prime.x \
 	tps_simple.x \
+	tps_read_char_input.x \
+	tps_complex_tester_1.x \
+	tps_destroy_before_creation.x \
+	tps_double_create.x \
+	tps_invalid_offset.x \
+	tps_read_write_before_creation.x \
+	tps_read_write_null_buffer.x \
+	tps_read_write_various_offsets.x \
+	tps_read_int_input.x \
+	tps_complex_tester_2.x \
+	tps_read_unsigned_char_input.x \
+	tps_read_double_input.x \
+	tps_testsuite.x \
 	HashMap_tester.x
 
 ## *** IMPORTANT *** ##
@@ -17,6 +30,7 @@ programs := \
 UTHREADLIB := libuthread
 UTHREADPATH := ../$(UTHREADLIB)
 libuthread := $(UTHREADPATH)/$(UTHREADLIB).a
+
 
 # Default rule
 all: $(libuthread) $(programs)
@@ -49,6 +63,7 @@ endif
 
 # Linker options
 LDFLAGS := -L$(UTHREADPATH) -luthread
+tps_testsuite.x: LDFLAGS += -Wl,--wrap=mmap
 
 # Include path
 INCLUDE := -I$(UTHREADPATH)
