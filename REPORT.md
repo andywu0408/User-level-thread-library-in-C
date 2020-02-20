@@ -187,7 +187,7 @@ All provided test cases has passed. We try to modify the given input and they
 #### Test for TPS
 
 A total of 14 testing programs are written to test our TPS implementation
-. There are four major criterias that we want to test our TPS with. First, we
+. There are four major criteria that we want to test our TPS with. First, we
 want to ensure that our TPS behaves as intended and doesn't crash when
 provided with erroneous cases, such as cases when client tries to access TPS
 before creation, recreate a TPS that is already created and not yet destroyed

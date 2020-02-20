@@ -8,6 +8,12 @@
 #include <tps.h>
 #include <sem.h>
 
+//This test file stimulates a case that:
+//thread 1 creates a TPS
+//thread 2 clones the TPS
+//thread 1 writes something to TPS
+//thread 2 reads from TPS and checks the output
+
 static char msg1[TPS_SIZE] = "Hello world!\n";
 static pthread_t tid1;
 static sem_t sem1, sem2;

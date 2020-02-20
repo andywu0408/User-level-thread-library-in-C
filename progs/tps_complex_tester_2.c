@@ -8,6 +8,8 @@
 #include <tps.h>
 #include <sem.h>
 
+// please check inline comments for details of this test file
+
 static char msg1[TPS_SIZE] = "Hello world!\n";
 static char msg2[TPS_SIZE] = "hello world!\n";
 

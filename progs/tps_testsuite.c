@@ -8,6 +8,15 @@
 #include <tps.h>
 #include <sem.h>
 
+//This test file try to override mmap function and get TPS address illegally.
+//The library will be tested if a signal is triggered by illegally accessing
+//private TPS
+//
+//expected output:
+//Catching TPS Protection Error...
+//Get segfault and end program now...
+//Segmentation fault (core dumped)
+
 static char msg1[TPS_SIZE] = "Hello world!\n";
 static char msg2[TPS_SIZE] = "hello world!\n";
 void *latest_mmap_addr; // global variable to make address returned by mmap accessible
