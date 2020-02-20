@@ -15,7 +15,6 @@
 
 /* global map<tid, tps> hidden in library */
 map_t map = NULL;
-
 /**
  * TPS class with
  * protected page;
@@ -200,4 +199,3 @@ int tps_clone(pthread_t tid)
     exit_critical_section();
     return 0;
 }
-

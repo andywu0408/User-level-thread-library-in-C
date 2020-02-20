@@ -17,6 +17,7 @@ programs := \
 	tps_complex_tester_2.x \
 	tps_read_unsigned_char_input.x \
 	tps_read_double_input.x \
+	tps_testsuite.x \
 	HashMap_tester.x
 
 ## *** IMPORTANT *** ##
@@ -29,6 +30,7 @@ programs := \
 UTHREADLIB := libuthread
 UTHREADPATH := ../$(UTHREADLIB)
 libuthread := $(UTHREADPATH)/$(UTHREADLIB).a
+
 
 # Default rule
 all: $(libuthread) $(programs)
@@ -61,6 +63,7 @@ endif
 
 # Linker options
 LDFLAGS := -L$(UTHREADPATH) -luthread
+tps_testsuite.x: LDFLAGS += -Wl,--wrap=mmap
 
 # Include path
 INCLUDE := -I$(UTHREADPATH)
