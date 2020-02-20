@@ -8,34 +8,34 @@
 #include <tps.h>
 #include <sem.h>
 
-static char msg1[TPS_SIZE] = "Hello world!\n";
-static char msg2[TPS_SIZE] = "hello world!\n";
+static int msg1 = 1;
+static int msg2 = 2;
 
 static sem_t sem1, sem2;
 
 void *thread2(__attribute__((unused)) void *arg)
 {
-    char *buffer = malloc(TPS_SIZE);
+    int *buffer = malloc(1*sizeof(int));
 
     /* Create TPS and initialize with *msg1 */
     tps_create();
-    tps_write(0, TPS_SIZE, msg1);
+    tps_write(0, 1, &msg1);
 
     /* Read from TPS and make sure it contains the message */
-    memset(buffer, 0, TPS_SIZE);
-    tps_read(0, TPS_SIZE, buffer);
-    assert(!memcmp(msg1, buffer, TPS_SIZE));
-    printf("thread2: read OK!\n");
+    memset(buffer, 0, 1);
+    tps_read(0, 1, buffer);
+    assert(!memcmp(&msg1, buffer, 1));
+    printf("thread2: read integer OK!\n");
 
     /* Transfer CPU to thread 1 and get blocked */
     sem_up(sem1);
     sem_down(sem2);
 
     /* When we're back, read TPS and make sure it sill contains the original */
-    memset(buffer, 0, TPS_SIZE);
-    tps_read(0, TPS_SIZE, buffer);
-    assert(!memcmp(msg1, buffer, TPS_SIZE));
-    printf("thread2: read OK!\n");
+    memset(buffer, 0, 1);
+    tps_read(0, 1, buffer);
+    assert(!memcmp(&msg1, buffer, 1));
+    printf("thread2: read integer OK!\n");
 
     /* Transfer CPU to thread 1 and get blocked */
     sem_up(sem1);
@@ -50,7 +50,7 @@ void *thread2(__attribute__((unused)) void *arg)
 void *thread1(__attribute__((unused)) void *arg)
 {
     pthread_t tid;
-    char *buffer = malloc(TPS_SIZE);
+    char *buffer = malloc(1);
 
     /* Create thread 2 and get blocked */
     pthread_create(&tid, NULL, thread2, NULL);
@@ -60,10 +60,10 @@ void *thread1(__attribute__((unused)) void *arg)
     tps_clone(tid);
 
     /* Read the TPS and make sure it contains the original */
-    memset(buffer, 0, TPS_SIZE);
-    tps_read(0, TPS_SIZE, buffer);
-    assert(!memcmp(msg1, buffer, TPS_SIZE));
-    printf("thread1: read OK!\n");
+    memset(buffer, 0, 1);
+    tps_read(0, 1, buffer);
+    assert(!memcmp(&msg1, buffer, 1));
+    printf("thread1: read integer OK!\n");
 
     /* Modify TPS to cause a copy on write */
     buffer[0] = 'h';
@@ -74,10 +74,10 @@ void *thread1(__attribute__((unused)) void *arg)
     sem_down(sem1);
 
     /* When we're back, make sure our modification is still there */
-    memset(buffer, 0, TPS_SIZE);
-    tps_read(0, TPS_SIZE, buffer);
-    assert(!strcmp(msg2, buffer));
-    printf("thread1: read OK!\n");
+    memset(buffer, 0, 1);
+    tps_read(0, 1, buffer);
+    assert(!(msg2 == *buffer));
+    printf("thread1: read integer OK!\n");
 
     /* Transfer CPU to thread 2 */
     sem_up(sem2);
@@ -109,4 +109,3 @@ int main(void)
     sem_destroy(sem2);
     return 0;
 }
-

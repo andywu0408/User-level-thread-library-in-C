@@ -9,7 +9,6 @@
 #include <sem.h>
 
 static char msg1[TPS_SIZE] = "Hello world!\n";
-static char msg2[TPS_SIZE] = "hello world!\n";
 
 static sem_t sem1, sem2;
 
@@ -19,7 +18,7 @@ void *thread2(__attribute__((unused)) void *arg)
 
 	tps_create();
 
-	assert(tps_write(TPS_SIZE, TPS_SIZE, msg1); == -1);
+	assert(tps_write(TPS_SIZE, TPS_SIZE, msg1) == -1);
 	printf("thread2: passed check for invalid offset!\n");
 
 	memset(buffer, 0, TPS_SIZE);

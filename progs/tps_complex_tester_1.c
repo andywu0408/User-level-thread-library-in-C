@@ -9,7 +9,6 @@
 #include <sem.h>
 
 static char msg1[TPS_SIZE] = "Hello world!\n";
-static char msg2[TPS_SIZE] = "hello world!\n";
 static pthread_t tid1;
 static sem_t sem1, sem2;
 

@@ -8,9 +8,6 @@
 #include <tps.h>
 #include <sem.h>
 
-static char msg1[TPS_SIZE] = "Hello world!\n";
-static char msg2[TPS_SIZE] = "hello world!\n";
-
 static sem_t sem1, sem2;
 
 void *thread2(__attribute__((unused)) void *arg)
@@ -20,11 +17,11 @@ void *thread2(__attribute__((unused)) void *arg)
 	/* Check if writing to NULL buffer raises error */
 	tps_create();
 	assert(tps_write(0, TPS_SIZE, buffer) == -1);
-	printf("thread2: passed check for writing to NULL buffer");
+	printf("thread2: passed check for writing to NULL buffer\n");
 
 	/* Check if reading from NULL buffer raises error */
 	assert(tps_read(0, TPS_SIZE, buffer)== -1);
-	printf("thread2: passed check for reading from NULL buffer");
+	printf("thread2: passed check for reading from NULL buffer\n");
 
 	/* Transfer CPU to thread 1 and get blocked */
 	sem_up(sem1);
@@ -54,11 +51,11 @@ void *thread1(__attribute__((unused)) void *arg)
 
 	/* Check if reading from NULL buffer raises error */
 	assert(tps_read(0, TPS_SIZE, buffer)== -1);
-	printf("thread1: passed check for reading from NULL buffer");
+	printf("thread1: passed check for reading from NULL buffer\n");
 
 	/* Check if writing to NULL buffer raises error */
 	assert(tps_write(0, 1, buffer) == -1);
-	printf("thread1: passed check for writing to NULL buffer");
+	printf("thread1: passed check for writing to NULL buffer\n");
 
 	/* Transfer CPU to thread 2 and get blocked */
 	sem_up(sem2);

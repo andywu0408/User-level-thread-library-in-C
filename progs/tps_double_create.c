@@ -8,8 +8,6 @@
 #include <tps.h>
 #include <sem.h>
 
-static char msg1[TPS_SIZE] = "Hello world!\n";
-static char msg2[TPS_SIZE] = "hello world!\n";
 
 static sem_t sem1, sem2;
 
@@ -21,7 +19,7 @@ void *thread2(__attribute__((unused)) void *arg)
 	tps_create();
 	
 	assert(tps_create() == -1);
-	printf("thread2: passed check for double creation of tps");
+	printf("thread2: passed check for double creation of tps\n");
 
 	/* Transfer CPU to thread 1 and get blocked */
 	sem_up(sem1);
